@@ -38,7 +38,8 @@ def setup_encfs():
 def install_weechat():
     host.adduser('weechat', 'password')
     subprocess.check_call(['passwd', '-d', 'weechat'])
-    if helper.charm_config['encfs-enabled']:
+    if helper.charm_config['encfs-enabled'] and not helper.encfs_mounted():
+        
         setup_encfs()
     helper.install_systemd()
     host.service('enable', 'weechat.service')

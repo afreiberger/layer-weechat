@@ -51,9 +51,13 @@ class WeechatHelper():
             return 'Empty command'
         cmd = "*{}".format(command)
         hookenv.log("Calling fifo with: {}".format(cmd))
-        result = subprocess.check_output('echo {} > {}'.format(cmd, self.fifo_file),
-                                         shell=True)
-        return result.decode()
+        try:
+            with open(self.fifo_file,"w") as fifo:
+                print(cmd, file = fifo)
+        except:
+            return False
+        else:
+            return True
 
     def generate_certificate(self):
         pkey = crypto.PKey()
@@ -93,3 +97,12 @@ class WeechatHelper():
         for line in self.charm_config['user-config'].strip().split('\n'):
             self.weechat_command(line)
         self.weechat_command('/save')
+
+    def encfs_mounted(self):
+        cmd = 'mount | grep {}'.format(self.weechat_folder)
+        try:
+            subprocess.check_output(cmd, shell=True)
+        except CalledProcessError:
+            return False
+        else:
+            return True
